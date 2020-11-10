@@ -1,9 +1,11 @@
 package com.fudan.pm.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fudan.pm.domain.LaunchActivity;
 import com.fudan.pm.domain.Role;
 import com.fudan.pm.domain.User;
 import com.fudan.pm.domain.UserRole;
+import com.fudan.pm.repository.LaunchActivityRepository;
 import com.fudan.pm.repository.RoleRepository;
 import com.fudan.pm.repository.UserRepository;
 import com.fudan.pm.repository.UserRoleRepository;
@@ -26,6 +28,9 @@ public class AuthService {
     private UserRoleRepository userRoleRepository;
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private LaunchActivityRepository launchActivityRepository;
 
     public JSONObject login(String username, String password) {
         JSONObject result = new JSONObject();
@@ -83,6 +88,27 @@ public class AuthService {
             result.put("message", "no permission");
             return result;
         }
+        result.put("message", "success");
+        result.put("username", username);
+        result.put("usrId", user.getUserId());
+        result.put("avatar", user.getAvatar());
+        result.put("introduction", user.getIntroduction());
+        return result;
+    }
+
+    public JSONObject my_project(String username) {
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            result.put("message", "no permission");
+            return result;
+        }
+        LaunchActivity launchActivity = launchActivityRepository.findByUserId(user.getUserId());
+        if (launchActivity == null) {
+            result.put("message", "你还没有参与项目");
+            return result;
+        }
+        //修改添加项目信息
         result.put("message", "success");
         result.put("username", username);
         result.put("usrId", user.getUserId());
