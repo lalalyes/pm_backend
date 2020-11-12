@@ -63,7 +63,7 @@ public class AuthController {
     @GetMapping(value = "/my_info",produces = "application/json")
     @ResponseBody
     public ResponseEntity<?> my_info() {
-        System.out.println("进来了--------------------------------------------------:");
+        //System.out.println("进来了--------------------------------------------------:");
         String username = ((org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = authService.my_info(username);
         return Tool.getResponseEntity(result);
@@ -77,7 +77,21 @@ public class AuthController {
         to do: 获取项目信息，不要动我这一部分，我后面会改
          */
         String username = ((org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        JSONObject result = authService.my_info(username);
+        System.out.println(username+":--------------------------------------------------");
+        JSONObject result = authService.my_project(username);
+        return Tool.getResponseEntity(result);
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping(value = "/all_project",produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<?> all_project() {
+        /*
+        to do: 获取项目信息，不要动我这一部分，我后面会改
+         */
+        String username = ((org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        System.out.println(username+":--------------------------------------------------");
+        JSONObject result = authService.all_project(username);
         return Tool.getResponseEntity(result);
     }
 }

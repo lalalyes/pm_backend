@@ -1,21 +1,18 @@
 package com.fudan.pm.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.fudan.pm.domain.LaunchActivity;
-import com.fudan.pm.domain.Role;
-import com.fudan.pm.domain.User;
-import com.fudan.pm.domain.UserRole;
-import com.fudan.pm.repository.LaunchActivityRepository;
-import com.fudan.pm.repository.RoleRepository;
-import com.fudan.pm.repository.UserRepository;
-import com.fudan.pm.repository.UserRoleRepository;
+import net.sf.json.JSONArray;
+import com.fudan.pm.domain.*;
+import com.fudan.pm.repository.*;
 import com.fudan.pm.security.jwt.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
+import java.util.*;
 
 @Transactional
 @Service
@@ -31,6 +28,9 @@ public class AuthService {
 
     @Autowired
     private LaunchActivityRepository launchActivityRepository;
+
+    @Autowired
+    private ActivityRepository activityRepository;
 
     public JSONObject login(String username, String password) {
         JSONObject result = new JSONObject();
@@ -103,17 +103,112 @@ public class AuthService {
             result.put("message", "no permission");
             return result;
         }
-        LaunchActivity launchActivity = launchActivityRepository.findByUserId(user.getUserId());
-        if (launchActivity == null) {
+        System.out.println("1:--------------------------------------------------");
+        List<LaunchActivity> launchActivity = launchActivityRepository.findByUserId(user.getUserId());
+        //to do: 测试launchActivity是为空还是大小为0
+        System.out.println("launch activity is null?:--------------------------------------------------" + (launchActivity == null));
+        if (launchActivity != null) {
+            System.out.println("launch activity is not null:--------------------------------------------------");
+            if(launchActivity.size() == 0){
+                System.out.println("launch activity size is 0:--------------------------------------------------");
+            }
+        }
+
+
+        if (launchActivity == null || launchActivity.size() == 0) {
             result.put("message", "你还没有参与项目");
             return result;
         }
+        System.out.println("2:--------------------------------------------------");
+
+
+        List<Map<String, Object>> data = new ArrayList<>();
+        //JASONArray re = new JASONArray();
         //修改添加项目信息
-        result.put("message", "success");
-        result.put("username", username);
-        result.put("usrId", user.getUserId());
-        result.put("avatar", user.getAvatar());
-        result.put("introduction", user.getIntroduction());
+        for(int i = 0; i<launchActivity.size(); i++){
+            Activity activity = activityRepository.findByActivityId(launchActivity.get(i).getActivityId());
+            List<ActivityVenue> activityVenue = activity.getActivityVenues();
+            //JSONObject ac = new JSONObject();
+            Map<String, Object> ac = new HashMap<>();
+            ac.put("activity_id", activity.getActivity_id());
+            ac.put("activity_name", activity.getActivity_name());
+            ac.put("introduction", activity.getIntroduction());
+            ac.put("type", activity.getType());
+            ac.put("picture", activity.getPicture());
+            ac.put("capacity", activity.getCapacity());
+            ac.put("activity_start_time", activity.getActivity_start_time());
+            ac.put("activity_end_time", activity.getActivity_end_time());
+            ac.put("sign_up_start_time", activity.getSign_up_start_time());
+            ac.put("sign_up_end_time", activity.getSign_up_end_time());
+            ac.put("launch_time", activity.getLaunch_time());
+            ac.put("create_time", activity.getCreate_time());
+
+            String location = "";
+            for(int j = 0; j < activityVenue.size();j++){
+                Venue venue = activityVenue.get(j).getVenue();
+                location = location + venue.getCampus() + venue.getVenue_name() + "  ";
+            }
+            ac.put("venue", location);
+
+            data.add(ac);
+            System.out.println("activity_id:--------------------------------------------------"+launchActivity.get(i).getActivityId());
+        }
+        System.out.println("3:--------------------------------------------------");
+
+        String dataString = JSON.toJSONString(data);
+        result.put("data", dataString);
+        return result;
+    }
+
+    //获取所有项目
+    public JSONObject all_project(String username) {
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            result.put("message", "no permission");
+            return result;
+        }
+        System.out.println("1:--------------------------------------------------");
+        Iterator<Activity> activities = activityRepository.findAll().iterator();
+        System.out.println("2:--------------------------------------------------");
+
+
+        List<Map<String, Object>> data = new ArrayList<>();
+        //JASONArray re = new JASONArray();
+        //修改添加项目信息
+        while(activities.hasNext()){
+
+            Activity activity = activities.next();
+            List<ActivityVenue> activityVenue = activity.getActivityVenues();
+            //JSONObject ac = new JSONObject();
+            Map<String, Object> ac = new HashMap<>();
+            ac.put("activity_id", activity.getActivity_id());
+            ac.put("activity_name", activity.getActivity_name());
+            ac.put("introduction", activity.getIntroduction());
+            ac.put("type", activity.getType());
+            ac.put("picture", activity.getPicture());
+            ac.put("capacity", activity.getCapacity());
+            ac.put("activity_start_time", activity.getActivity_start_time());
+            ac.put("activity_end_time", activity.getActivity_end_time());
+            ac.put("sign_up_start_time", activity.getSign_up_start_time());
+            ac.put("sign_up_end_time", activity.getSign_up_end_time());
+            ac.put("launch_time", activity.getLaunch_time());
+            ac.put("create_time", activity.getCreate_time());
+
+            String location = "";
+            for(int j = 0; j < activityVenue.size();j++){
+                Venue venue = activityVenue.get(j).getVenue();
+                location = location + venue.getCampus() + venue.getVenue_name() + "  ";
+            }
+            ac.put("venue", location);
+
+            data.add(ac);
+            System.out.println("activity_id:--------------------------------------------------"+activity.getActivity_id());
+        }
+        System.out.println("3:--------------------------------------------------");
+
+        String dataString = JSON.toJSONString(data);
+        result.put("data", dataString);
         return result;
     }
 }
