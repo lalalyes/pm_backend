@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 @Repository
 public interface ActivityRepository extends CrudRepository<Activity, Long> {
     Activity findByActivityId(int activity_id);
+    List<Activity> findAll();
 //    List<Activity> findAll(new Specification<Activity>() {
 //        @Override
 //        public Predicate toPredicate(Root<Activity> transaction,
