@@ -2,16 +2,13 @@ package com.fudan.pm.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fudan.pm.domain.Activity;
-import com.fudan.pm.domain.Participate;
-import com.fudan.pm.domain.User;
-import com.fudan.pm.repository.ActivityRepository;
-import com.fudan.pm.repository.ParticipateRepository;
-import com.fudan.pm.repository.UserRepository;
+import com.fudan.pm.domain.*;
+import com.fudan.pm.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("All")
@@ -23,7 +20,39 @@ public class ActivityService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private ActivityVenueRepository activityVenueRepository;
+    @Autowired
     private ParticipateRepository participateRepository;
+    @Autowired
+    private VenueRepository venueRepository;
+
+    public JSONObject searchActivity(String content, int type) {
+        JSONObject result = new JSONObject();
+        List<Activity> activities = new ArrayList<>();
+        if(type == 0) {
+            activities = activityRepository.findByActivityName(content);
+        } else {
+            List<Venue> venues = venueRepository.findByVenueName(content);
+            for(Venue venue : venues) {
+                List<ActivityVenue> activityVenues = activityVenueRepository.findAllByVenue(venue);
+                for(ActivityVenue activityVenue : activityVenues) {
+                    activities.add(activityRepository.findByActivityId(activityVenue.getActivity_id()));
+                }
+            }
+        }
+        JSONArray activityArray = new JSONArray();
+        for (Activity activity:activities){
+            JSONObject jsonActivity = new JSONObject();
+            jsonActivity.put("activityName",activity.getActivity_name());
+            jsonActivity.put("activityId",activity.getActivity_id());
+            jsonActivity.put("introduction",activity.getIntroduction());
+            jsonActivity.put("type",activity.getType());
+            jsonActivity.put("picture",activity.getPicture());
+            activityArray.add(jsonActivity);
+        }
+        result.put("activities",activityArray);
+        return result;
+    }
 
     public JSONObject activityList (String username){
         JSONObject result = new JSONObject();
@@ -51,11 +80,6 @@ public class ActivityService {
     public JSONObject enrolledActivity(String username){
         JSONObject result = new JSONObject();
         User user = userRepository.findByUsername(username);
-        if (user == null) {
-            result.put("message", "failure");
-            return result;
-        }
-
         JSONArray activityArray = new JSONArray();
         List<Participate> participates = participateRepository.findByUserId(user.getUserId());
         for (Participate participate:participates){

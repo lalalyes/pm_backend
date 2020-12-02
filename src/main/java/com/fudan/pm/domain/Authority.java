@@ -16,7 +16,7 @@ public class Authority implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "authority_id")
-    private Long authority_id;
+    private Long authorityId;
 
     @Column(name = "auth_name",unique = true)
     private String authName;
@@ -38,7 +38,7 @@ public class Authority implements GrantedAuthority {
     }
 
     public Long getId() {
-        return authority_id;
+        return authorityId;
     }
 
     /**

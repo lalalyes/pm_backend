@@ -22,7 +22,7 @@ public class Activity implements Serializable {
     private List<ActivityVenue> activityVenues;
 
     @Column(name = "activity_name")
-    private String activity_name;
+    private String activityName;
 
     @Column(name = "introduction")
     private String introduction;
@@ -37,22 +37,22 @@ public class Activity implements Serializable {
     private int capacity;
 
     @Column(name = "activity_start_time")
-    private Timestamp activity_start_time;
+    private Timestamp activityStartTime;
 
     @Column(name = "activity_end_time")
-    private Timestamp activity_end_time;
+    private Timestamp activityEndTime;
 
     @Column(name = "sign_up_start_time")
-    private Timestamp sign_up_start_time;
+    private Timestamp signUpStartTime;
 
     @Column(name = "sign_up_end_time")
-    private Timestamp sign_up_end_time;
+    private Timestamp signUpEndTime;
 
     @Column(name = "launch_time")
-    private Timestamp launch_time;
+    private Timestamp launchTime;
 
     @Column(name = "create_time")
-    private Timestamp create_time;
+    private Timestamp createTime;
 
 
 
@@ -65,11 +65,11 @@ public class Activity implements Serializable {
     }
 
     public String getActivity_name() {
-        return activity_name;
+        return activityName;
     }
 
     public void setActivity_name(String activity_name) {
-        this.activity_name = activity_name;
+        this.activityName = activity_name;
     }
 
     public String getIntroduction() {
@@ -105,51 +105,51 @@ public class Activity implements Serializable {
     }
 
     public Timestamp getActivity_start_time() {
-        return activity_start_time;
+        return activityStartTime;
     }
 
     public void setActivity_start_time(Timestamp activity_start_time) {
-        this.activity_start_time = activity_start_time;
+        this.activityStartTime = activity_start_time;
     }
 
     public Timestamp getActivity_end_time() {
-        return activity_end_time;
+        return activityEndTime;
     }
 
     public void setActivity_end_time(Timestamp activity_end_time) {
-        this.activity_end_time = activity_end_time;
+        this.activityEndTime = activity_end_time;
     }
 
     public Timestamp getCreate_time() {
-        return create_time;
+        return createTime;
     }
 
     public void setCreate_time(Timestamp create_time) {
-        this.create_time = create_time;
+        this.createTime = create_time;
     }
 
     public Timestamp getLaunch_time() {
-        return launch_time;
+        return launchTime;
     }
 
     public void setLaunch_time(Timestamp launch_time) {
-        this.launch_time = launch_time;
+        this.launchTime = launch_time;
     }
 
     public Timestamp getSign_up_start_time() {
-        return sign_up_start_time;
+        return signUpStartTime;
     }
 
     public void setSign_up_start_time(Timestamp sign_up_start_time) {
-        this.sign_up_start_time = sign_up_start_time;
+        this.signUpStartTime = sign_up_start_time;
     }
 
     public Timestamp getSign_up_end_time() {
-        return sign_up_end_time;
+        return signUpEndTime;
     }
 
     public void setSign_up_end_time(Timestamp sign_up_end_time) {
-        this.sign_up_end_time = sign_up_end_time;
+        this.signUpEndTime = sign_up_end_time;
     }
 
     public List<ActivityVenue> getActivityVenues() {

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRoleRepository extends CrudRepository<UserRole, Long> {
-    void deleteAllByUser(User user);
+    //void deleteAllByUser(User user);
 
 }

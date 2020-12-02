@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,6 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ActivityController {
     @Autowired
     private ActivityService activityService;
+
+    @GetMapping("/searchActivity")
+    public ResponseEntity<?> searchActivity(@Validated @RequestParam(value = "content")String content, @Validated @RequestParam(value = "type")int type){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.searchActivity(content, type);
+        return Tool.getResponseEntity(result);
+    }
 
     @GetMapping("/activityList")
     public ResponseEntity<?> activityList(){

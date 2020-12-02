@@ -4,6 +4,7 @@ package com.fudan.pm.repository;
 import com.fudan.pm.domain.Activity;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,9 @@ import java.util.function.Predicate;
 public interface ActivityRepository extends CrudRepository<Activity, Long> {
     Activity findByActivityId(int activity_id);
     List<Activity> findAll();
+
+    @Query(value = "select * from activity where activity_name like CONCAT('%',?1,'%')",nativeQuery = true)
+    List<Activity> findByActivityName(String name);
 //    List<Activity> findAll(new Specification<Activity>() {
 //        @Override
 //        public Predicate toPredicate(Root<Activity> transaction,

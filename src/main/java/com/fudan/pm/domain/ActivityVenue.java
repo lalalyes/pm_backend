@@ -13,7 +13,7 @@ public class ActivityVenue implements Serializable {
     @Id
     //@ManyToOne(cascade= CascadeType.MERGE)
     @Column(name = "activity_id")
-    private int activity_id;
+    private int activityId;
     //private Activity activity;
 
 
@@ -26,11 +26,11 @@ public class ActivityVenue implements Serializable {
     private Venue venue;
 
     public int getActivity_id() {
-        return activity_id;
+        return activityId;
     }
 
     public void setActivity_id(int activity_id) {
-        this.activity_id = activity_id;
+        this.activityId = activity_id;
     }
 
 //    public Activity getActivity() {

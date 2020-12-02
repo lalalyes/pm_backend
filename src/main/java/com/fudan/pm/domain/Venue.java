@@ -19,29 +19,29 @@ public class Venue implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "venue_id")
-    private int venue_id;
+    private int venueId;
 
 
     @Column(name = "venue_name")
-    private String venue_name;
+    private String venueName;
 
     @Column(name = "campus")
     private String campus;
 
     public int getVenue_id() {
-        return venue_id;
+        return venueId;
     }
 
     public void setVenue_id(int venue_id) {
-        this.venue_id = venue_id;
+        this.venueId = venue_id;
     }
 
     public String getVenue_name() {
-        return venue_name;
+        return venueName;
     }
 
     public void setVenue_name(String venue_name) {
-        this.venue_name = venue_name;
+        this.venueName = venue_name;
     }
 
     public String getCampus() {
