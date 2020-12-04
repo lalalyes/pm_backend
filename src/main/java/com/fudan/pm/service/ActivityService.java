@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings("All")
@@ -59,10 +60,6 @@ public class ActivityService {
     public JSONObject activityList (String username){
         JSONObject result = new JSONObject();
         User user = userRepository.findByUsername(username);
-        if (user == null) {
-            result.put("message", "failure");
-            return result;
-        }
 
         List<Activity> activities = activityRepository.findAll(user.getUserId());
         JSONArray activityArray = new JSONArray();
@@ -103,7 +100,7 @@ public class ActivityService {
         JSONObject result = new JSONObject();
         User user = userRepository.findByUsername(username);
         Activity activity = activityRepository.findByActivityId(activityId);
-        if (user == null || activity == null) {
+        if (activity == null) {
             result.put("message", "failure");
             return result;
         }
@@ -138,6 +135,52 @@ public class ActivityService {
         host.put("userId", launchActivity.getUserId());
         host.put("username", userRepository.findByUserId(launchActivity.getUserId()).getUsername());
         result.put("host", host);
+        return result;
+    }
+
+    public JSONObject activityEnrollment(String username,int activityId){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Activity activity = activityRepository.findByActivityId(activityId);
+        if (activity == null) {
+            result.put("message", "activity not exist");
+            return result;
+        }
+
+        if(activity.getSign_up_start_time().after(new Date()) || activity.getSign_up_end_time().before(new Date())) {
+            result.put("message", "sign up is close");
+            return result;
+        }
+
+        Participate participate = participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId);
+        if(participate != null) {
+            result.put("message", "you had participated it");
+            return result;
+        }
+
+        Participate p = new Participate(user.getUserId(), activityId);
+        participateRepository.save(p);
+        result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject retreatEnrollment(String username,int activityId){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Activity activity = activityRepository.findByActivityId(activityId);
+        if (activity == null) {
+            result.put("message", "activity not exist");
+            return result;
+        }
+
+
+        Participate participate = participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId);
+        if(participate == null) {
+            result.put("message", "not sign up for this activity");
+            return result;
+        }
+        participateRepository.delete(participate);
+        result.put("message", "success");
         return result;
     }
 }

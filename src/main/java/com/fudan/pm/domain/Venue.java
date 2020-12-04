@@ -16,6 +16,7 @@ import java.util.Set;
 @Table(name="venue")
 public class Venue implements Serializable{
 
+    private static final long serialVersionUID = 448245627632530252L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "venue_id")

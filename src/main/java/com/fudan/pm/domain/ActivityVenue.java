@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="activityVenue")
 public class ActivityVenue implements Serializable {
+    private static final long serialVersionUID = 5650166152833698529L;
     @Id
     //@ManyToOne(cascade= CascadeType.MERGE)
     @Column(name = "activity_id")

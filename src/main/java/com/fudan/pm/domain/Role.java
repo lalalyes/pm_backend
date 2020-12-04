@@ -15,6 +15,7 @@ import java.util.*;
 @JsonIgnoreProperties({"handler","hibernateLazyInitializer"})
 
 public class Role implements Serializable,GrantedAuthority {
+    private static final long serialVersionUID = 1718168173096985194L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")

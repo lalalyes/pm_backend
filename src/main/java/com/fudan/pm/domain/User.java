@@ -14,6 +14,7 @@ import java.util.*;
 @Table(name = "user")      //指定对应的数据库表
 @JsonIgnoreProperties({"handler","hibernateLazyInitializer"})
 public class User implements UserDetails, Serializable {
+    private static final long serialVersionUID = -1310504274374136209L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

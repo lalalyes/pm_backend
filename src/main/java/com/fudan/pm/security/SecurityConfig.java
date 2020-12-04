@@ -49,6 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/activityList").hasRole("user")
                 .antMatchers("/enrolledActivity").hasRole("user")
                 .antMatchers("/activityDetails").hasRole("user")
+                .antMatchers("/activityEnrollment").hasRole("user")
+                .antMatchers("/retreatEnrollment").hasRole("user")
                 .anyRequest().authenticated();
 
 //      Here we use JWT(Json Web Token) to authenticate the user.

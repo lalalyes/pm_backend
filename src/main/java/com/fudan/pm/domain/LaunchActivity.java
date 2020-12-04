@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Entity
 @Table(name="launchActivity")
 public class LaunchActivity implements Serializable {
+    private static final long serialVersionUID = -1822899102468052519L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "activity_id")

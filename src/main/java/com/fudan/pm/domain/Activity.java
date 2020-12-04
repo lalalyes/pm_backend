@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name="activity")
 public class Activity implements Serializable {
+    private static final long serialVersionUID = -7384679330427870404L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "activity_id")

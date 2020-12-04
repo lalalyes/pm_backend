@@ -32,6 +32,17 @@ public class Participate implements Serializable {
     @Column(name = "picture")
     private String picture;
 
+    public Participate(int userId, int activityId) {
+        this.userId = userId;
+        this.activityId = activityId;
+        this.signUpTime = new Date();
+        this.score = -1;
+        this.comment = "";
+        this.picture = "";
+    }
+    public Participate() {
+    }
+
     public int getUser_id() {
         return userId;
     }

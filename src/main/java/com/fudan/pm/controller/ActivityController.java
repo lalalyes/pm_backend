@@ -46,4 +46,18 @@ public class ActivityController {
         JSONObject result = activityService.activityDetails(username, activityId);
         return Tool.getResponseEntity(result);
     }
+
+    @GetMapping("/activityEnrollment")
+    public ResponseEntity<?> activityEnrollment(@Validated @RequestParam(value = "activityId")int activityId){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.activityEnrollment(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/retreatEnrollment")
+    public ResponseEntity<?> retreatEnrollment(@Validated @RequestParam(value = "activityId")int activityId){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.retreatEnrollment(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
 }
