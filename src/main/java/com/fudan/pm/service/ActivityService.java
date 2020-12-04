@@ -25,6 +25,8 @@ public class ActivityService {
     private ParticipateRepository participateRepository;
     @Autowired
     private VenueRepository venueRepository;
+    @Autowired
+    private LaunchActivityRepository launchActivityRepository;
 
     public JSONObject searchActivity(String content, int type) {
         JSONObject result = new JSONObject();
@@ -62,7 +64,7 @@ public class ActivityService {
             return result;
         }
 
-        List<Activity> activities = activityRepository.findAll();
+        List<Activity> activities = activityRepository.findAll(user.getUserId());
         JSONArray activityArray = new JSONArray();
         for (Activity activity:activities){
             JSONObject jsonActivity = new JSONObject();
@@ -82,6 +84,7 @@ public class ActivityService {
         User user = userRepository.findByUsername(username);
         JSONArray activityArray = new JSONArray();
         List<Participate> participates = participateRepository.findByUserId(user.getUserId());
+        System.out.println(participates);
         for (Participate participate:participates){
             Activity activity = activityRepository.findByActivityId(participate.getActivity_id());
             JSONObject jsonActivity = new JSONObject();
@@ -108,14 +111,33 @@ public class ActivityService {
         result.put("activityName",activity.getActivity_name());
         result.put("introduction",activity.getIntroduction());
         result.put("type",activity.getType());
+        result.put("capacity",activity.getCapacity());
         result.put("picture",activity.getPicture());
         result.put("activityVenue",activity.getActivityVenues());
         result.put("activityStartTime",activity.getActivity_start_time());
         result.put("activityEndTime",activity.getActivity_end_time());
         result.put("signUpStartTime",activity.getSign_up_start_time());
         result.put("signUpEndTime",activity.getSign_up_end_time());
+        result.put("enrolled",participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId) != null);
 
-        //这里好像没写完
+        JSONArray jsonComments = new JSONArray();
+        List<Participate> participates = participateRepository.findCommentsByActivityId(activityId);
+        for(Participate participate : participates) {
+            JSONObject object = new JSONObject();
+            object.put("userId", participate.getUser_id());
+            object.put("username", userRepository.findByUserId(participate.getUser_id()).getUsername());
+            object.put("content", participate.getComment());
+            object.put("score", participate.getScore());
+            object.put("picture", participate.getPicture());
+            jsonComments.add(object);
+        }
+        result.put("comments", jsonComments);
+
+        JSONObject host = new JSONObject();
+        LaunchActivity launchActivity = launchActivityRepository.findByActivityId(activityId);
+        host.put("userId", launchActivity.getUserId());
+        host.put("username", userRepository.findByUserId(launchActivity.getUserId()).getUsername());
+        result.put("host", host);
         return result;
     }
 }

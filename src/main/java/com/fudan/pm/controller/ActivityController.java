@@ -40,4 +40,10 @@ public class ActivityController {
         return Tool.getResponseEntity(result);
     }
 
+    @GetMapping("/activityDetails")
+    public ResponseEntity<?> activityDetails(@Validated @RequestParam(value = "activityId")int activityId){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.activityDetails(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
 }

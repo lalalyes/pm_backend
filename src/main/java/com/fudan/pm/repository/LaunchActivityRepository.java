@@ -11,4 +11,5 @@ import java.util.List;
  */
 public interface LaunchActivityRepository extends CrudRepository<LaunchActivity, Long> {
     List<LaunchActivity> findByUserId(int userId);
+    LaunchActivity findByActivityId(int activity_id);
 }

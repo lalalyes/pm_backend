@@ -8,6 +8,7 @@ import java.util.Date;
 @Table(name = "participate")
 @IdClass(Participate.class)
 public class Participate implements Serializable {
+    private static final long serialVersionUID = -983100731383151320L;
     @Id
     @Column(name = "user_id")
     private int userId;

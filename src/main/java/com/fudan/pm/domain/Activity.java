@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,22 +38,22 @@ public class Activity implements Serializable {
     private int capacity;
 
     @Column(name = "activity_start_time")
-    private Timestamp activityStartTime;
+    private Date activityStartTime;
 
     @Column(name = "activity_end_time")
-    private Timestamp activityEndTime;
+    private Date activityEndTime;
 
     @Column(name = "sign_up_start_time")
-    private Timestamp signUpStartTime;
+    private Date signUpStartTime;
 
     @Column(name = "sign_up_end_time")
-    private Timestamp signUpEndTime;
+    private Date signUpEndTime;
 
     @Column(name = "launch_time")
-    private Timestamp launchTime;
+    private Date launchTime;
 
     @Column(name = "create_time")
-    private Timestamp createTime;
+    private Date createTime;
 
 
 
@@ -104,7 +105,7 @@ public class Activity implements Serializable {
         this.capacity = capacity;
     }
 
-    public Timestamp getActivity_start_time() {
+    public Date getActivity_start_time() {
         return activityStartTime;
     }
 
@@ -112,7 +113,7 @@ public class Activity implements Serializable {
         this.activityStartTime = activity_start_time;
     }
 
-    public Timestamp getActivity_end_time() {
+    public Date getActivity_end_time() {
         return activityEndTime;
     }
 
@@ -120,7 +121,7 @@ public class Activity implements Serializable {
         this.activityEndTime = activity_end_time;
     }
 
-    public Timestamp getCreate_time() {
+    public Date getCreate_time() {
         return createTime;
     }
 
@@ -128,7 +129,7 @@ public class Activity implements Serializable {
         this.createTime = create_time;
     }
 
-    public Timestamp getLaunch_time() {
+    public Date getLaunch_time() {
         return launchTime;
     }
 
@@ -136,7 +137,7 @@ public class Activity implements Serializable {
         this.launchTime = launch_time;
     }
 
-    public Timestamp getSign_up_start_time() {
+    public Date getSign_up_start_time() {
         return signUpStartTime;
     }
 
@@ -144,7 +145,7 @@ public class Activity implements Serializable {
         this.signUpStartTime = sign_up_start_time;
     }
 
-    public Timestamp getSign_up_end_time() {
+    public Date getSign_up_end_time() {
         return signUpEndTime;
     }
 

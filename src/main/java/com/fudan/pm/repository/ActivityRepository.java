@@ -17,7 +17,9 @@ import java.util.function.Predicate;
 @Repository
 public interface ActivityRepository extends CrudRepository<Activity, Long> {
     Activity findByActivityId(int activity_id);
-    List<Activity> findAll();
+
+    @Query(value = "select * from activity where unix_timestamp(sign_up_start_time) < unix_timestamp(NOW()) and unix_timestamp(sign_up_end_time) > unix_timestamp(NOW()) and activity_id not in (select activity_id from participate where user_id = ?1)",nativeQuery = true)
+    List<Activity> findAll(int id);
 
     @Query(value = "select * from activity where activity_name like CONCAT('%',?1,'%')",nativeQuery = true)
     List<Activity> findByActivityName(String name);
