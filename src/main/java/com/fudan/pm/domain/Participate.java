@@ -3,9 +3,13 @@ package com.fudan.pm.domain;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cascade;
 
 @Entity
 @Table(name = "participate")
+@JsonIgnoreProperties({"handler","hibernateLazyInitializer"})
 @IdClass(Participate.class)
 public class Participate implements Serializable {
     private static final long serialVersionUID = -983100731383151320L;

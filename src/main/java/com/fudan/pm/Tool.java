@@ -36,9 +36,15 @@ public class Tool {
         return null;
     }
 
+    public static ResponseEntity<?> getErrorJson(String message) throws JSONException {
+        JSONObject result = new JSONObject();
+        result.put("message", message);
+        return new ResponseEntity<>(result.toJSONString(), HttpStatus.BAD_REQUEST);
+    }
+
     public static ResponseEntity<?> getResponseEntity(JSONObject result) throws JSONException {
         if (result.getString("message") != null && !"success".equals(result.getString("message"))) {
-            return new ResponseEntity<>(result.toJSONString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(result.toJSONString(), HttpStatus.CREATED);
         }
         return new ResponseEntity<>(result.toJSONString(), HttpStatus.OK);
     }

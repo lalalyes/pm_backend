@@ -56,7 +56,23 @@ public class Activity implements Serializable {
     @Column(name = "create_time")
     private Date createTime;
 
+    public Activity(String activityName, String introduction, String type, String picture, int capacity, Date activityStartTime,
+                    Date activityEndTime, Date signUpStartTime, Date signUpEndTime) {
+        this.activityName = activityName;
+        this.introduction = introduction;
+        this.type = type;
+        this.picture = picture;
+        this.capacity = capacity;
+        this.activityStartTime = activityStartTime;
+        this.activityEndTime = activityEndTime;
+        this.signUpStartTime = signUpStartTime;
+        this.signUpEndTime = signUpEndTime;
+        this.createTime = new Date();
+    }
 
+    public Activity() {
+
+    }
 
     public int getActivity_id() {
         return activityId;

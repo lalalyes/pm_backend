@@ -23,6 +23,8 @@ public interface ActivityRepository extends CrudRepository<Activity, Long> {
 
     @Query(value = "select * from activity where activity_name like CONCAT('%',?1,'%')",nativeQuery = true)
     List<Activity> findByActivityName(String name);
+
+    void deleteByActivityId(int activityId);
 //    List<Activity> findAll(new Specification<Activity>() {
 //        @Override
 //        public Predicate toPredicate(Root<Activity> transaction,

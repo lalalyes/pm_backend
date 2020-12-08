@@ -4,13 +4,18 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fudan.pm.domain.*;
 import com.fudan.pm.repository.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("All")
 @Transactional
@@ -37,9 +42,9 @@ public class ActivityService {
         } else {
             List<Venue> venues = venueRepository.findByVenueName(content);
             for(Venue venue : venues) {
-                List<ActivityVenue> activityVenues = activityVenueRepository.findAllByVenue(venue);
+                List<ActivityVenue> activityVenues = activityVenueRepository.findByVenueId(venue.getVenue_id());
                 for(ActivityVenue activityVenue : activityVenues) {
-                    activities.add(activityRepository.findByActivityId(activityVenue.getActivity_id()));
+                    activities.add(activityRepository.findByActivityId(activityVenue.getActivityId()));
                 }
             }
         }
@@ -110,12 +115,15 @@ public class ActivityService {
         result.put("type",activity.getType());
         result.put("capacity",activity.getCapacity());
         result.put("picture",activity.getPicture());
-        result.put("activityVenue",activity.getActivityVenues());
+        ActivityVenue av = activityVenueRepository.findByActivityId(activity.getActivity_id());
+        Venue venue = venueRepository.findByVenueId(av.getVenueId());
+        result.put("activityVenue",venue.getCampus() + venue.getVenue_name());
         result.put("activityStartTime",activity.getActivity_start_time());
         result.put("activityEndTime",activity.getActivity_end_time());
         result.put("signUpStartTime",activity.getSign_up_start_time());
         result.put("signUpEndTime",activity.getSign_up_end_time());
         result.put("enrolled",participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId) != null);
+        result.put("currentNumber", participateRepository.getActivityCurrentNumber(activityId));
 
         JSONArray jsonComments = new JSONArray();
         List<Participate> participates = participateRepository.findCommentsByActivityId(activityId);
@@ -180,6 +188,98 @@ public class ActivityService {
             return result;
         }
         participateRepository.delete(participate);
+        result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject activityCheckIn(String username, int activityId){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Activity activity = activityRepository.findByActivityId(activityId);
+        if (activity == null) {
+            result.put("message", "activity not exist");
+            return result;
+        }
+        Participate participate = participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId);
+        if(participate == null) {
+            result.put("message", "not sign up for this activity");
+            return result;
+        }
+
+        if(participate.getPresent() == 1) {
+            result.put("message", "you have checked in");
+            return result;
+        }
+        participateRepository.updatePresent(user.getUserId(), activityId);
+        result.put("message", "success");
+        return result;
+    }
+
+    public String saveFile(MultipartFile file){
+        //文件后缀名
+        String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        //上传文件名
+        String filename = UUID.randomUUID() + suffix;
+        //服务器端保存的文件对象
+        String saveDir;
+        saveDir = "/var/www/html/images/";
+//        saveDir = "D:\\Documents\\AD web\\pj\\courseImages\\";
+        File serverFile = new File(saveDir + filename);
+
+        if(!serverFile.exists()) {
+            //先得到文件的上级目录，并创建上级目录，在创建文件
+            serverFile.getParentFile().mkdir();
+            try {
+                //创建文件
+                serverFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //将上传的文件写入到服务器端文件内
+        try {
+            file.transferTo(serverFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filename;
+    }
+
+    public JSONObject createActivity(String username, MultipartFile picture, JSONObject paramsJSON){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Venue venue = venueRepository.findByVenueId(paramsJSON.getIntValue("venueId"));
+        if(venue == null) {
+            result.put("message", "venue not exist");
+            return result;
+        }
+        String name = saveFile(picture);
+        Activity activity = new Activity(paramsJSON.getString("activityName"), paramsJSON.getString("introduction"),
+                paramsJSON.getString("type"), name,
+                paramsJSON.getIntValue("limit"), paramsJSON.getDate("activityStartTime"),
+                paramsJSON.getDate("activityEndTime"), paramsJSON.getDate("signUpStartTime"),
+                paramsJSON.getDate("signUpEndTime"));
+        activityRepository.save(activity);
+        ActivityVenue av = new ActivityVenue(activity.getActivity_id(), paramsJSON.getIntValue("venueId"));
+        activityVenueRepository.save(av);
+        LaunchActivity la = new LaunchActivity(user.getUserId(), activity.getActivity_id());
+        launchActivityRepository.save(la);
+        result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject deleteActivity(String username, int activityId){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        LaunchActivity la = launchActivityRepository.findByActivityIdAndUserId(activityId, user.getUserId());
+        if (la == null) {
+            result.put("message", "the activity is not yours");
+            return result;
+        }
+        launchActivityRepository.deleteByActivityId(activityId);
+        activityVenueRepository.deleteByActivityId(activityId);
+        participateRepository.deleteByActivityId(activityId);
+        activityRepository.deleteByActivityId(activityId);
         result.put("message", "success");
         return result;
     }

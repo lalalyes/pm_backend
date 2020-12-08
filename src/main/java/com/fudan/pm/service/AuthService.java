@@ -26,10 +26,16 @@ public class AuthService {
     private RoleRepository roleRepository;
 
     @Autowired
+    private VenueRepository venueRepository;
+
+    @Autowired
     private LaunchActivityRepository launchActivityRepository;
 
     @Autowired
     private ActivityRepository activityRepository;
+
+    @Autowired
+    private ActivityVenueRepository activityVenueRepository;
 
     public JSONObject login(String username, String password) {
         JSONObject result = new JSONObject();
@@ -126,7 +132,7 @@ public class AuthService {
         //修改添加项目信息
         for(int i = 0; i<launchActivity.size(); i++){
             Activity activity = activityRepository.findByActivityId(launchActivity.get(i).getActivityId());
-            List<ActivityVenue> activityVenue = activity.getActivityVenues();
+            ActivityVenue activityVenue = activityVenueRepository.findByActivityId(activity.getActivity_id());
             //JSONObject ac = new JSONObject();
             Map<String, Object> ac = new HashMap<>();
             ac.put("activity_id", activity.getActivity_id());
@@ -143,10 +149,8 @@ public class AuthService {
             ac.put("create_time", activity.getCreate_time());
 
             String location = "";
-            for(int j = 0; j < activityVenue.size();j++){
-                Venue venue = activityVenue.get(j).getVenue();
-                location = location + venue.getCampus() + venue.getVenue_name() + "  ";
-            }
+            Venue venue = venueRepository.findByVenueId(activityVenue.getVenueId());
+            location = location + venue.getCampus() + venue.getVenue_name() + "  ";
             ac.put("venue", location);
 
             data.add(ac);
@@ -178,7 +182,7 @@ public class AuthService {
         while(activities.hasNext()){
 
             Activity activity = activities.next();
-            List<ActivityVenue> activityVenue = activity.getActivityVenues();
+            ActivityVenue activityVenue = activityVenueRepository.findByActivityId(activity.getActivity_id());
             //JSONObject ac = new JSONObject();
             Map<String, Object> ac = new HashMap<>();
             ac.put("activity_id", activity.getActivity_id());
@@ -195,10 +199,8 @@ public class AuthService {
             ac.put("create_time", activity.getCreate_time());
 
             String location = "";
-            for(int j = 0; j < activityVenue.size();j++){
-                Venue venue = activityVenue.get(j).getVenue();
-                location = location + venue.getCampus() + venue.getVenue_name() + "  ";
-            }
+            Venue venue = venueRepository.findByVenueId(activityVenue.getVenueId());
+            location = location + venue.getCampus() + venue.getVenue_name() + "  ";
             ac.put("venue", location);
 
             data.add(ac);
@@ -208,6 +210,23 @@ public class AuthService {
 
         String dataString = JSON.toJSONString(data);
         result.put("data", dataString);
+        return result;
+    }
+
+    public JSONObject changePassword(String username, String oldPassword, String newPassword) {
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        if(user == null) {
+            result.put("message", "user not exist");
+            return result;
+        }
+        if(!user.getPassword().equals(oldPassword)) {
+            result.put("message", "wrong password");
+            return result;
+        }
+
+        userRepository.changePassword(user.getUserId(), newPassword);
+        result.put("message", "success");
         return result;
     }
 }

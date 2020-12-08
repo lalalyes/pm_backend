@@ -14,5 +14,7 @@ import java.util.List;
 public interface VenueRepository extends CrudRepository<Venue, Long>{
     @Query(value = "select * from venue where venue_name like CONCAT('%',?1,'%')",nativeQuery = true)
     List<Venue> findByVenueName(String name);
+
+    Venue findByVenueId(int venueId);
    // Venue findByVenue_id(int venue_id);
 }

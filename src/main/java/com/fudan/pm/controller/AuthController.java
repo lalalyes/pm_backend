@@ -4,6 +4,7 @@ package com.fudan.pm.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fudan.pm.Tool;
+import com.fudan.pm.controller.request.ChangePasswordRequest;
 import com.fudan.pm.controller.request.LoginRequest;
 import com.fudan.pm.controller.request.RegisterRequest;
 import com.fudan.pm.domain.User;
@@ -92,6 +93,17 @@ public class AuthController {
         String username = ((org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         System.out.println(username+":--------------------------------------------------");
         JSONObject result = authService.all_project(username);
+        return Tool.getResponseEntity(result);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@Validated @RequestBody ChangePasswordRequest request, BindingResult bindingResult) {
+        JSONObject result = Tool.DealParamError(bindingResult);
+        if (result != null) {
+            return new ResponseEntity<>(result.toJSONString(), HttpStatus.BAD_REQUEST);
+        }
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        result = authService.changePassword(username, request.getOldPassword(), request.getNewPassword());
         return Tool.getResponseEntity(result);
     }
 }
