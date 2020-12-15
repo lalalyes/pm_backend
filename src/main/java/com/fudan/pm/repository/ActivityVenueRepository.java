@@ -17,6 +17,10 @@ public interface ActivityVenueRepository extends CrudRepository<ActivityVenue, L
     @Query(value = "delete from activityVenue where activity_id=?1",nativeQuery = true)
     void deleteByActivityId(int activity_id);
 
+    @Modifying
+    @Query(value = "update activityVenue set venue_id = ?1 where activity_id=?2",nativeQuery = true)
+    void updateAV(int venue_id, int activity_id);
+
     ActivityVenue findByActivityId(int activity_id);
     List<ActivityVenue> findByVenueId(int venue_id);
 }

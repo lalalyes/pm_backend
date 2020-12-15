@@ -55,6 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/activityCheckIn").hasRole("user")
                 .antMatchers("/createActivity").hasRole("admin")
                 .antMatchers("/deleteActivity").hasRole("admin")
+                .antMatchers("/editActivity").hasRole("admin")
+                .antMatchers("/launchActivity").hasRole("admin")
                 .anyRequest().authenticated();
 
 //      Here we use JWT(Json Web Token) to authenticate the user.

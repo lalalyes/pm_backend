@@ -76,18 +76,12 @@ public class ActivityController {
         return Tool.getResponseEntity(result);
     }
 
-    @CrossOrigin(origins = "*")
-    @PostMapping("/createActivity")
-    @ResponseBody
-    public ResponseEntity<?> createActivity(@Validated @RequestParam("picture") MultipartFile picture, @Validated @RequestParam("params") String params) throws IOException {
-        JSONObject json = new JSONObject();
-        JSONObject paramsJSON = JSONObject.parseObject(params);
-
+    private boolean checkParams(MultipartFile picture, JSONObject paramsJSON) throws IOException {
         if (paramsJSON.getString("activityName") == null ||
                 paramsJSON.getString("introduction") == null ||
                 paramsJSON.getString("type") == null ||
                 paramsJSON.getString("venueId") == null ||
-                paramsJSON.getString("limit")==null ||
+                paramsJSON.getString("limit")==null || paramsJSON.getIntValue("limit") <= 0 ||
                 paramsJSON.getString("activityStartTime") == null ||
                 paramsJSON.getString("activityEndTime") == null ||
                 paramsJSON.getString("signUpStartTime") == null ||
@@ -97,14 +91,21 @@ public class ActivityController {
                 paramsJSON.getDate("signUpStartTime").before(new Date()) ||
                 paramsJSON.getDate("signUpStartTime").after(paramsJSON.getDate("signUpEndTime")) ||
                 paramsJSON.getDate("signUpEndTime").after(paramsJSON.getDate("activityStartTime"))){
-            return Tool.getErrorJson("parameter error");
+            return false;
         }
         BufferedImage bi = ImageIO.read(picture.getInputStream());
         if (bi == null){
-            json.put("message","An image is required");
-            return new ResponseEntity<>(json.toJSONString(),HttpStatus.BAD_REQUEST);
+            return false;
         }
+        return true;
+    }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/createActivity")
+    @ResponseBody
+    public ResponseEntity<?> createActivity(@Validated @RequestParam("picture") MultipartFile picture, @Validated @RequestParam("params") String params) throws IOException {
+        JSONObject paramsJSON = JSONObject.parseObject(params);
+        if(!checkParams(picture, paramsJSON)) return Tool.getErrorJson("parameter error");
         String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = activityService.createActivity(username, picture, paramsJSON);
         return Tool.getResponseEntity(result);
@@ -114,6 +115,25 @@ public class ActivityController {
     public ResponseEntity<?> deleteActivity(@Validated @RequestParam(value = "activityId")int activityId){
         String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = activityService.deleteActivity(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/editActivity")
+    @ResponseBody
+    public ResponseEntity<?> editActivity(@Validated @RequestParam("picture") MultipartFile picture, @Validated @RequestParam("params") String params) throws IOException {
+        JSONObject paramsJSON = JSONObject.parseObject(params);
+        if(!checkParams(picture, paramsJSON)) return Tool.getErrorJson("parameter error");
+        if(paramsJSON.getString("activityId") == null) return Tool.getErrorJson("parameter error");
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.editActivity(username, picture, paramsJSON);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/launchActivity")
+    public ResponseEntity<?> launchActivity(@Validated @RequestParam(value = "activityId")int activityId){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.launchActivity(username, activityId);
         return Tool.getResponseEntity(result);
     }
 }

@@ -283,4 +283,57 @@ public class ActivityService {
         result.put("message", "success");
         return result;
     }
+
+    public JSONObject editActivity(String username, MultipartFile picture, JSONObject paramsJSON){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Venue venue = venueRepository.findByVenueId(paramsJSON.getIntValue("venueId"));
+        int activityId = paramsJSON.getIntValue("activityId");
+        LaunchActivity la = launchActivityRepository.findByActivityIdAndUserId(activityId, user.getUserId());
+        if(la == null) {
+            result.put("message", "not your activity");
+            return result;
+        }
+
+        Activity activity = activityRepository.findByActivityId(activityId);
+        if(activity.getLaunch_time() != null) {
+            result.put("message", "the activity has been launched");
+            return result;
+        }
+
+        if(venue == null) {
+            result.put("message", "venue not exist");
+            return result;
+        }
+        String name = saveFile(picture);
+        activityRepository.updateActivity(paramsJSON.getString("activityName"), paramsJSON.getString("introduction"),
+                paramsJSON.getString("type"), name,
+                paramsJSON.getIntValue("limit"), paramsJSON.getDate("activityStartTime"),
+                paramsJSON.getDate("activityEndTime"), paramsJSON.getDate("signUpStartTime"),
+                paramsJSON.getDate("signUpEndTime"), new Date(), activityId);
+
+        activityVenueRepository.updateAV(venue.getVenue_id(), activityId);
+        result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject launchActivity(String username, int activityId){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        LaunchActivity la = launchActivityRepository.findByActivityIdAndUserId(activityId, user.getUserId());
+        if (la == null) {
+            result.put("message", "the activity is not yours");
+            return result;
+        }
+
+        Activity activity = activityRepository.findByActivityId(activityId);
+        if(activity.getLaunch_time() != null) {
+            result.put("message", "the activity has been launched");
+            return result;
+        }
+
+        activityRepository.updateLaunch(new Date(), activityId);
+        result.put("message", "success");
+        return result;
+    }
 }

@@ -25,6 +25,7 @@ public interface ParticipateRepository extends CrudRepository<Participate,Long> 
     @Query(value = "update participate set present = 1 where user_id=?1 and activity_id=?2",nativeQuery = true)
     void updatePresent(int user_id, int activity_id);
 
+
     @Modifying
     @Query(value = "delete from participate where activity_id=?1",nativeQuery = true)
     void deleteByActivityId(int activity_id);
