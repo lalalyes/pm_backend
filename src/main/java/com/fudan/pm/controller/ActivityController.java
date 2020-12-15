@@ -91,6 +91,7 @@ public class ActivityController {
                 paramsJSON.getDate("signUpStartTime").before(new Date()) ||
                 paramsJSON.getDate("signUpStartTime").after(paramsJSON.getDate("signUpEndTime")) ||
                 paramsJSON.getDate("signUpEndTime").after(paramsJSON.getDate("activityStartTime"))){
+            System.out.println(paramsJSON.getDate("signUpStartTime"));
             return false;
         }
         BufferedImage bi = ImageIO.read(picture.getInputStream());
@@ -101,9 +102,9 @@ public class ActivityController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping("/createActivity")
+    @PostMapping(value="/createActivity",produces = "multipart/form-data")
     @ResponseBody
-    public ResponseEntity<?> createActivity(@Validated @RequestParam("picture") MultipartFile picture, @Validated @RequestParam("params") String params) throws IOException {
+    public ResponseEntity<?> createActivity(@Validated @RequestPart("picture") MultipartFile picture, @Validated @RequestPart("params") String params) throws IOException {
         JSONObject paramsJSON = JSONObject.parseObject(params);
         if(!checkParams(picture, paramsJSON)) return Tool.getErrorJson("parameter error");
         String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
@@ -121,7 +122,7 @@ public class ActivityController {
     @CrossOrigin(origins = "*")
     @PostMapping("/editActivity")
     @ResponseBody
-    public ResponseEntity<?> editActivity(@Validated @RequestParam("picture") MultipartFile picture, @Validated @RequestParam("params") String params) throws IOException {
+    public ResponseEntity<?> editActivity(@Validated @RequestPart("picture") MultipartFile picture, @Validated @RequestPart("params") String params) throws IOException {
         JSONObject paramsJSON = JSONObject.parseObject(params);
         if(!checkParams(picture, paramsJSON)) return Tool.getErrorJson("parameter error");
         if(paramsJSON.getString("activityId") == null) return Tool.getErrorJson("parameter error");

@@ -222,8 +222,8 @@ public class ActivityService {
         String filename = UUID.randomUUID() + suffix;
         //服务器端保存的文件对象
         String saveDir;
-        saveDir = "/var/www/html/images/";
-//        saveDir = "D:\\Documents\\AD web\\pj\\courseImages\\";
+        //saveDir = "C:\\Users\\DELL\\Desktop\\aa\\";
+        saveDir = "/usr/local/nginx/html/images/";
         File serverFile = new File(saveDir + filename);
 
         if(!serverFile.exists()) {
