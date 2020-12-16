@@ -2,6 +2,7 @@ package com.fudan.pm.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fudan.pm.controller.request.CommentRequest;
 import com.fudan.pm.domain.*;
 import com.fudan.pm.repository.*;
 import org.springframework.beans.BeanUtils;
@@ -334,6 +335,166 @@ public class ActivityService {
 
         activityRepository.updateLaunch(new Date(), activityId);
         result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject hostActivityList(String username){
+        JSONObject result = new JSONObject();
+        JSONArray activities = new JSONArray();
+        User user = userRepository.findByUsername(username);
+        List<LaunchActivity> launchActivities = launchActivityRepository.findByUserId(user.getUserId());
+        for(LaunchActivity launchActivity : launchActivities) {
+            JSONObject object = new JSONObject();
+            Activity activity = activityRepository.findByActivityId(launchActivity.getActivityId());
+            object.put("activityId", activity.getActivity_id());
+            object.put("activityName", activity.getActivity_name());
+            object.put("type", activity.getType());
+            ActivityVenue av = activityVenueRepository.findByActivityId(activity.getActivity_id());
+            Venue venue = venueRepository.findByVenueId(av.getVenueId());
+            object.put("venue", venue.getCampus() + venue.getVenue_name());
+            object.put("signUpStartTime", activity.getSign_up_start_time());
+            object.put("signUpEndTime", activity.getSign_up_end_time());
+            object.put("activityStartTime", activity.getActivity_start_time());
+            object.put("activityEndTime", activity.getActivity_end_time());
+            object.put("createTime", activity.getCreate_time());
+            object.put("launchTime", activity.getLaunch_time());
+            object.put("limit", activity.getCapacity());
+            object.put("enrollment", participateRepository.getActivityCurrentNumber(activity.getActivity_id()));
+            object.put("introduction", activity.getIntroduction());
+            object.put("picture", activity.getPicture());
+            int status;
+            Date date = new Date();
+            if(activity.getLaunch_time() == null) status = 0;
+            else if(date.before(activity.getSign_up_start_time())) status = 1;
+            else if(date.after(activity.getSign_up_start_time()) && date.before(activity.getSign_up_start_time())) status = 2;
+            else if(date.before(activity.getActivity_start_time())) status = 3;
+            else if(date.after(activity.getActivity_start_time()) && date.before(activity.getActivity_end_time())) status = 4;
+            else status = 5;
+            object.put("status", status);
+            activities.add(object);
+        }
+        result.put("activities", activities);
+        return result;
+    }
+
+    public JSONObject hostActivityDetails(String username, int activityId){
+        JSONObject object = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        LaunchActivity la = launchActivityRepository.findByActivityIdAndUserId(activityId, user.getUserId());
+        if (la == null) {
+            object.put("message", "the activity is not yours");
+            return object;
+        }
+        Activity activity = activityRepository.findByActivityId(activityId);
+        object.put("activityId", activity.getActivity_id());
+        object.put("activityName", activity.getActivity_name());
+        object.put("type", activity.getType());
+        ActivityVenue av = activityVenueRepository.findByActivityId(activity.getActivity_id());
+        Venue venue = venueRepository.findByVenueId(av.getVenueId());
+        object.put("venue", venue.getCampus() + venue.getVenue_name());
+        object.put("signUpStartTime", activity.getSign_up_start_time());
+        object.put("signUpEndTime", activity.getSign_up_end_time());
+        object.put("activityStartTime", activity.getActivity_start_time());
+        object.put("activityEndTime", activity.getActivity_end_time());
+        object.put("createTime", activity.getCreate_time());
+        object.put("launchTime", activity.getLaunch_time());
+        object.put("limit", activity.getCapacity());
+        int enrollment = participateRepository.getActivityCurrentNumber(activity.getActivity_id());
+        object.put("enrollment", enrollment);
+        int checkIn = participateRepository.getActivityCheckedNumber(activity.getActivity_id());
+        object.put("checkIn", checkIn);
+        object.put("participateRate", enrollment == 0 ? 0 : (checkIn + 0.0) / enrollment);
+
+        JSONArray checkedList = new JSONArray();
+        JSONArray unCheckedList = new JSONArray();
+        for(Participate p : participateRepository.findByActivityId(activityId)) {
+            User u = userRepository.findByUserId(p.getUser_id());
+            JSONObject userObject = new JSONObject();
+            userObject.put("userId", u.getUserId());
+            userObject.put("username", u.getUsername());
+            if(p.getPresent() == 0) {
+                unCheckedList.add(userObject);
+            } else {
+                checkedList.add(userObject);
+            }
+        }
+        object.put("checkedList", checkedList);
+        object.put("unCheckedList", unCheckedList);
+
+        JSONArray jsonComments = new JSONArray();
+        List<Participate> participates = participateRepository.findCommentsByActivityId(activityId);
+        int totalScore = 0;
+        for(Participate participate : participates) {
+            JSONObject o = new JSONObject();
+            o.put("userId", participate.getUser_id());
+            o.put("username", userRepository.findByUserId(participate.getUser_id()).getUsername());
+            o.put("content", participate.getComment());
+            o.put("score", participate.getScore());
+            totalScore += participate.getScore();
+            jsonComments.add(o);
+        }
+        object.put("comments", jsonComments);
+        object.put("averageScore", jsonComments.size() == 0 ? 0 : (totalScore + 0.0) / jsonComments.size());
+
+        object.put("introduction", activity.getIntroduction());
+        object.put("picture", activity.getPicture());
+        int status;
+        Date date = new Date();
+        if(activity.getLaunch_time() == null) status = 0;
+        else if(date.before(activity.getSign_up_start_time())) status = 1;
+        else if(date.after(activity.getSign_up_start_time()) && date.before(activity.getSign_up_start_time())) status = 2;
+        else if(date.before(activity.getActivity_start_time())) status = 3;
+        else if(date.after(activity.getActivity_start_time()) && date.before(activity.getActivity_end_time())) status = 4;
+        else status = 5;
+        object.put("status", status);
+        return object;
+    }
+
+    public JSONObject my_info(String username) {
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        result.put("username", user.getUsername());
+        result.put("workNumber", user.getWorkNumber());
+        result.put("introduction", user.getIntroduction());
+        return result;
+    }
+
+    public JSONObject comment(String username, CommentRequest request) {
+        int activityId = request.getActivityId();
+        String content = request.getText();
+        int score = request.getScore();
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        Participate p = participateRepository.findByUserIdAndActivityId(user.getUserId(), activityId);
+        if(p == null) {
+            result.put("message", "you had participated it");
+            return result;
+        }
+        if(p.getScore() != -1) {
+            result.put("message", "you had commented");
+            return result;
+        }
+        if(p.getPresent() == 0) {
+            result.put("message", "you are not present");
+            return result;
+        }
+        participateRepository.updateComment(user.getUserId(), activityId, score, content);
+        result.put("message", "success");
+        return result;
+    }
+
+    public JSONObject getVenueList() {
+        JSONObject result = new JSONObject();
+        JSONArray list = new JSONArray();
+        List<Venue> venues = venueRepository.findAll();
+        for(Venue venue : venues) {
+            JSONObject v = new JSONObject();
+            v.put("venueId", venue.getVenue_id());
+            v.put("campus", venue.getCampus());
+            v.put("venueName", venue.getVenue_name());
+            list.add(v);
+        }
+        result.put("venueList", list);
         return result;
     }
 }

@@ -96,6 +96,7 @@ public class AuthService {
         result.put("message", "success");
         result.put("username", username);
         result.put("usrId", user.getUserId());
+        result.put("workNumber", user.getWorkNumber());
         result.put("avatar", user.getAvatar());
         result.put("introduction", user.getIntroduction());
         return result;

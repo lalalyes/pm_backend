@@ -27,7 +27,7 @@ public interface ActivityRepository extends CrudRepository<Activity, Long> {
     List<Activity> findByActivityName(String name);
 
     @Modifying
-    @Query(value = "update activity set present = ?1 where activity_id=?2",nativeQuery = true)
+    @Query(value = "update activity set launch_time = ?1 where activity_id=?2",nativeQuery = true)
     void updateLaunch(Date launch_time, int activity_id);
 
     void deleteByActivityId(int activityId);

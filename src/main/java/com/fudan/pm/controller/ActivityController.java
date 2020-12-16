@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fudan.pm.Tool;
 import com.fudan.pm.controller.request.ChangePasswordRequest;
+import com.fudan.pm.controller.request.CommentRequest;
 import com.fudan.pm.domain.Activity;
 import com.fudan.pm.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +136,45 @@ public class ActivityController {
     public ResponseEntity<?> launchActivity(@Validated @RequestParam(value = "activityId")int activityId){
         String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = activityService.launchActivity(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/hostActivityList")
+    public ResponseEntity<?> hostActivityList(){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.hostActivityList(username);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/hostActivityDetails")
+    public ResponseEntity<?> hostActivityDetails(@Validated @RequestParam(value = "activityId")int activityId){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.hostActivityDetails(username, activityId);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/my_info")
+    public ResponseEntity<?> hostActivityDetails(){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.my_info(username);
+        return Tool.getResponseEntity(result);
+    }
+
+    @PostMapping("/writeReview")
+    public ResponseEntity<?> login(@Validated @RequestBody CommentRequest request, BindingResult bindingResult) {
+        JSONObject result = Tool.DealParamError(bindingResult);
+        if (result != null) {
+            return new ResponseEntity<>(result.toJSONString(), HttpStatus.BAD_REQUEST);
+        }
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        result = activityService.comment(username, request);
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/getVenueList")
+    public ResponseEntity<?> getVenueList(){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.getVenueList();
         return Tool.getResponseEntity(result);
     }
 }

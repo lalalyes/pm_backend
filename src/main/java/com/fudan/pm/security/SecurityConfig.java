@@ -43,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/welcome").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/register").permitAll()
+                .antMatchers("/my_info").permitAll()
                 .antMatchers("/changePassword").permitAll()
-                .antMatchers("/my_info").hasRole("user")
                 .antMatchers("/my_project").hasRole("user")
                 .antMatchers("/searchActivity").hasRole("user")
                 .antMatchers("/activityList").hasRole("user")
@@ -57,6 +57,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/deleteActivity").hasRole("admin")
                 .antMatchers("/editActivity").hasRole("admin")
                 .antMatchers("/launchActivity").hasRole("admin")
+                .antMatchers("/hostActivityList").hasRole("admin")
+                .antMatchers("/hostActivityDetails").hasRole("admin")
+                .antMatchers("/getVenueList").hasRole("admin")
+                .antMatchers("/writeReview").hasRole("user")
+
                 .anyRequest().authenticated();
 
 //      Here we use JWT(Json Web Token) to authenticate the user.
