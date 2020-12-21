@@ -3,8 +3,8 @@ package com.fudan.pm.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fudan.pm.Tool;
-import com.fudan.pm.controller.request.ChangePasswordRequest;
 import com.fudan.pm.controller.request.CommentRequest;
+import com.fudan.pm.controller.request.EditRequest;
 import com.fudan.pm.domain.Activity;
 import com.fudan.pm.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +118,22 @@ public class ActivityController {
         String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = activityService.deleteActivity(username, activityId);
         return Tool.getResponseEntity(result);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/editActivityNoPic")
+    @ResponseBody
+    public ResponseEntity<?> editActivityNoPic(@Validated @RequestBody EditRequest request, BindingResult bindingResult) {
+        JSONObject result = Tool.DealParamError(bindingResult);
+        if (result != null) {
+            return new ResponseEntity<>(result.toJSONString(), HttpStatus.BAD_REQUEST);
+        }
+        Date now = new Date();
+        if(request.getSignUpStartTime().after(now) && request.getSignUpEndTime().after(request.getSignUpStartTime()) && request.getActivityStartTime().after(request.getSignUpEndTime()) && request.getActivityEndTime().after(request.getActivityStartTime())) {
+            String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+            result = activityService.editActivityNoPic(username, request);
+            return Tool.getResponseEntity(result);
+        } else return Tool.getErrorJson("parameter error");
     }
 
     @CrossOrigin(origins = "*")

@@ -3,6 +3,7 @@ package com.fudan.pm.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fudan.pm.controller.request.CommentRequest;
+import com.fudan.pm.controller.request.EditRequest;
 import com.fudan.pm.domain.*;
 import com.fudan.pm.repository.*;
 import org.springframework.beans.BeanUtils;
@@ -318,6 +319,36 @@ public class ActivityService {
         return result;
     }
 
+    public JSONObject editActivityNoPic(String username, EditRequest request){
+        JSONObject result = new JSONObject();
+        User user = userRepository.findByUsername(username);
+        LaunchActivity la = launchActivityRepository.findByActivityIdAndUserId(request.getActivityId(), user.getUserId());
+        if(la == null) {
+            result.put("message", "not your activity");
+            return result;
+        }
+        Activity activity = activityRepository.findByActivityId(request.getActivityId());
+        if(activity.getLaunch_time() != null) {
+            result.put("message", "the activity has been launched");
+            return result;
+        }
+
+        Venue venue = venueRepository.findByVenueId(request.getVenueId());
+        if(venue == null) {
+            result.put("message", "venue not exist");
+            return result;
+        }
+        activityRepository.updateActivity(request.getActivityName(), request.getIntroduction(),
+                request.getType(), activity.getPicture(),
+                request.getLimit(), request.getActivityStartTime(),
+                request.getActivityEndTime(), request.getSignUpStartTime(),
+                request.getSignUpEndTime(), new Date(), request.getActivityId());
+
+        activityVenueRepository.updateAV(venue.getVenue_id(), request.getActivityId());
+        result.put("message", "success");
+        return result;
+    }
+
     public JSONObject launchActivity(String username, int activityId){
         JSONObject result = new JSONObject();
         User user = userRepository.findByUsername(username);
@@ -392,6 +423,7 @@ public class ActivityService {
         ActivityVenue av = activityVenueRepository.findByActivityId(activity.getActivity_id());
         Venue venue = venueRepository.findByVenueId(av.getVenueId());
         object.put("venue", venue.getCampus() + venue.getVenue_name());
+        object.put("venueId", venue.getVenue_id());
         object.put("signUpStartTime", activity.getSign_up_start_time());
         object.put("signUpEndTime", activity.getSign_up_end_time());
         object.put("activityStartTime", activity.getActivity_start_time());

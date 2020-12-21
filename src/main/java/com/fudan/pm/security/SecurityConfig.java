@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/createActivity").hasRole("admin")
                 .antMatchers("/deleteActivity").hasRole("admin")
                 .antMatchers("/editActivity").hasRole("admin")
+                .antMatchers("/editActivityNoPic").hasRole("admin")
                 .antMatchers("/launchActivity").hasRole("admin")
                 .antMatchers("/hostActivityList").hasRole("admin")
                 .antMatchers("/hostActivityDetails").hasRole("admin")
