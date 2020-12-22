@@ -62,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/hostActivityDetails").hasRole("admin")
                 .antMatchers("/getVenueList").hasRole("admin")
                 .antMatchers("/writeReview").hasRole("user")
+                .antMatchers("/activityEnd").hasRole("user")
 
                 .anyRequest().authenticated();
 

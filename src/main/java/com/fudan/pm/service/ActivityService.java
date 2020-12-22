@@ -529,4 +529,26 @@ public class ActivityService {
         result.put("venueList", list);
         return result;
     }
+
+    public JSONObject activityEnd(String username) {
+        JSONObject result = new JSONObject();
+        JSONArray list = new JSONArray();
+        User user = userRepository.findByUsername(username);
+        List<Participate> participates = participateRepository.findByUserId(user.getUserId());
+        for(Participate participate : participates) {
+            Activity activity = activityRepository.findByActivityId(participate.getActivity_id());
+            if(activity.getActivity_end_time().after(new Date())) {
+                continue;
+            }
+            JSONObject a = new JSONObject();
+            a.put("activityName", activity.getActivity_name());
+            a.put("activityId", activity.getActivity_id());
+            a.put("introduction", activity.getIntroduction());
+            a.put("type", activity.getType());
+            a.put("picture", activity.getPicture());
+            list.add(a);
+        }
+        result.put("activities", list);
+        return result;
+    }
 }

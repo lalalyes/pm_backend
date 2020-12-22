@@ -189,8 +189,14 @@ public class ActivityController {
 
     @GetMapping("/getVenueList")
     public ResponseEntity<?> getVenueList(){
-        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         JSONObject result = activityService.getVenueList();
+        return Tool.getResponseEntity(result);
+    }
+
+    @GetMapping("/activityEnd")
+    public ResponseEntity<?> activityEnd(){
+        String username = ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        JSONObject result = activityService.activityEnd(username);
         return Tool.getResponseEntity(result);
     }
 }

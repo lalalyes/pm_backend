@@ -24,6 +24,7 @@ public interface ParticipateRepository extends CrudRepository<Participate,Long> 
 
     @Query(value = "select * from participate where activity_id=?1 and comment != ''",nativeQuery = true)
     List<Participate> findCommentsByActivityId(int activity_id);
+
     Participate findByUserIdAndActivityId(int user_id, int activity_id);
 
     @Modifying
