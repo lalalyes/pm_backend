@@ -14,10 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("All")
 @Transactional
@@ -534,18 +531,12 @@ public class ActivityService {
         JSONObject result = new JSONObject();
         JSONArray list = new JSONArray();
         User user = userRepository.findByUsername(username);
-        List<Participate> participates = participateRepository.findByUserId(user.getUserId());
-        for(Participate participate : participates) {
-            Activity activity = activityRepository.findByActivityId(participate.getActivity_id());
-            if(activity.getActivity_end_time().after(new Date())) {
-                continue;
-            }
+        List<Map<String, Object>> participates = participateRepository.findByUserIdEnd(user.getUserId());
+        for(Map<String, Object> map : participates) {
             JSONObject a = new JSONObject();
-            a.put("activityName", activity.getActivity_name());
-            a.put("activityId", activity.getActivity_id());
-            a.put("introduction", activity.getIntroduction());
-            a.put("type", activity.getType());
-            a.put("picture", activity.getPicture());
+            for(String key : map.keySet()) {
+                a.put(key, map.get(key).toString());
+            }
             list.add(a);
         }
         result.put("activities", list);

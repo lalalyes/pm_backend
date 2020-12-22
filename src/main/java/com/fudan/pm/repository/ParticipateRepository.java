@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ParticipateRepository extends CrudRepository<Participate,Long> {
@@ -26,6 +27,9 @@ public interface ParticipateRepository extends CrudRepository<Participate,Long> 
     List<Participate> findCommentsByActivityId(int activity_id);
 
     Participate findByUserIdAndActivityId(int user_id, int activity_id);
+
+    @Query(value = "select activity.activity_id, activity_name, introduction, type, activity.picture from participate inner join activity on participate.activity_id=activity.activity_id where user_id=?1 and unix_timestamp(activity_end_time) < unix_timestamp(NOW()) order by activity_start_time desc ",nativeQuery = true)
+    List<Map<String, Object>> findByUserIdEnd(int user_id);
 
     @Modifying
     @Query(value = "update participate set present = 1 where user_id=?1 and activity_id=?2",nativeQuery = true)
