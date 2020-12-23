@@ -535,7 +535,9 @@ public class ActivityService {
         for(Map<String, Object> map : participates) {
             JSONObject a = new JSONObject();
             for(String key : map.keySet()) {
-                a.put(key, map.get(key).toString());
+                if(key.equals("activity_name")) a.put("activityName", map.get(key).toString());
+                else if(key.equals("activity_id")) a.put("activityId", map.get(key).toString());
+                else a.put(key, map.get(key).toString());
             }
             list.add(a);
         }
